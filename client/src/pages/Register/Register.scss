@@ -1,0 +1,25 @@
+.center{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: center;
+
+    .form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+
+        .formItem{
+            width: 70%;
+        }
+        .button{
+            text-align: center;
+        width: 12rem;
+    }
+    }
+    
+}
