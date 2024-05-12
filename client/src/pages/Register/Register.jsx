@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Register.scss";
-import { Form, Input, Button, message } from "antd";
+import { registerUser } from "../../apis/users";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -19,82 +22,81 @@ function Register() {
     setPassword(e.target.value);
   };
 
-  const onFinish = () => {
-    console.log("Success:", { name, email, password });
-    message.success("Registration successful");
-    setName("");
-    setEmail("");
-    setPassword("");
-  };
+ const handleSubmit = async (e) => {
+   e.preventDefault(); // Prevent default form submission behavior
+   setLoading(true);
+   setError(null);
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+   try {
+     const response = await registerUser({ name, email, password });
+     if (response) {
+       console.log("Registration response:", response.data); // Assuming the response contains user data
+       setSuccess(true);
+     } else {
+       console.error("Registration failed: Response is undefined");
+       setError("Registration failed. Please try again later.");
+     }
+   } catch (error) {
+     console.error("Registration failed:", error);
+     setError("Registration failed. Please try again later.");
+   } finally {
+     setLoading(false);
+   }
+ };
+
+  useEffect(() => {
+    // Clear success message after 3 seconds
+    const timer = setTimeout(() => {
+      setSuccess(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [success]);
 
   return (
     <div className="center">
       <h1>Register</h1>
-      <Form
-        className="form"
-        name="basic"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        style={{
-          maxWidth: 800,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item
-          className="formItem"
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Please input your name!" }]}
-        >
-          <Input name="name" value={name} onChange={handleNameChange} />
-        </Form.Item>
-        <Form.Item
-          className="formItem"
-          label="Email"
-          name="email"
-          rules={[{ required: true, message: "Please input your email!" }]}
-        >
-          <Input name="email" value={email} onChange={handleEmailChange} />
-        </Form.Item>
-        <Form.Item
-          className="formItem"
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
-        >
-          <Input.Password
-            name="password"
+      {success && (
+        <p className="success-message">
+          Registration successful! Redirecting...
+        </p>
+      )}
+      {error && <p className="error-message">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={handleNameChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={handleEmailChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
             value={password}
             onChange={handlePasswordChange}
+            required
           />
-        </Form.Item>
-
-        <Form.Item
-          wrapperCol={{
-            offset: 2,
-            span: 16,
-          }}
-        >
-          <Button className="button" type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-
-        <p>Already registered? Login</p>
-      </Form>
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
+      </form>
     </div>
   );
 }

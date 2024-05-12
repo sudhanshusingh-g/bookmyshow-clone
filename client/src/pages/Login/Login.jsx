@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Form, Input, Button, message } from "antd";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
- 
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -15,74 +12,38 @@ function Login() {
     setPassword(e.target.value);
   };
 
-  const onFinish = () => {
-    console.log("Success:", { email, password });
-    message.success("Registration successful");
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+    console.log("Submitting:", { email, password });
+    // You can perform further validation or send the data to your backend here
     setEmail("");
     setPassword("");
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
   };
 
   return (
     <div className="center">
       <h1>Login</h1>
-      <Form
-        className="form"
-        name="basic"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        style={{
-          maxWidth: 800,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-      
-        <Form.Item
-          className="formItem"
-          label="Email"
-          name="email"
-          rules={[{ required: true, message: "Please input your email!" }]}
-        >
-          <Input name="email" value={email} onChange={handleEmailChange} />
-        </Form.Item>
-        <Form.Item
-          className="formItem"
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
-        >
-          <Input.Password
-            name="password"
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
             value={password}
             onChange={handlePasswordChange}
+            required
           />
-        </Form.Item>
-
-        <Form.Item
-          wrapperCol={{
-            offset: 2,
-            span: 16,
-          }}
-        >
-          <Button className="button" type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-
-        <p>Not registered? Login</p>
-      </Form>
+        </div>
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
 }
