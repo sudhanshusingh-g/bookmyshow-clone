@@ -26,11 +26,13 @@ function Register() {
    e.preventDefault(); // Prevent default form submission behavior
    setLoading(true);
    setError(null);
+   setName('');
+   setEmail('');
+   setPassword('');
 
    try {
      const response = await registerUser({ name, email, password });
      if (response) {
-       console.log("Registration response:", response.data); // Assuming the response contains user data
        setSuccess(true);
      } else {
        console.error("Registration failed: Response is undefined");

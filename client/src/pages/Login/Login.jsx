@@ -1,9 +1,14 @@
-import React, { useState } from "react";
-
+import React, { useState,useEffect } from "react";
+import { loginUser } from "../../apis/users";
+import {useNavigate} from "react-router-dom";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  
+const navigate=useNavigate();
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -12,13 +17,44 @@ function Login() {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    console.log("Submitting:", { email, password });
-    // You can perform further validation or send the data to your backend here
-    setEmail("");
-    setPassword("");
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setEmail("");
+  setPassword("");
+  setLoading(true);
+
+  try {
+    const response = await loginUser({ email, password });
+    console.log("Login response:", response.data.success); // Add this line
+    if (response && response.data.success) {
+      setSuccess(true);
+      console.log("Logged in");
+      navigate("/");
+    } else {
+      console.error(
+        "Login failed:",
+        response?.data?.message || "Unknown error"
+      );
+      setError("Login failed. Please check your email and password.");
+    }
+  } catch (error) {
+    console.error("Login failed:", error);
+    setError("Login failed. Please try again later.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+   useEffect(() => {
+     const timer = setTimeout(() => {
+       setSuccess(false);
+     }, 3000);
+
+     return () => clearTimeout(timer);
+   }, [success]);
 
   return (
     <div className="center">
@@ -42,7 +78,9 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in.." : "Login"}
+        </button>
       </form>
     </div>
   );
