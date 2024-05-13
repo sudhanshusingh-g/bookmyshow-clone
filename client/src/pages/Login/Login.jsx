@@ -29,6 +29,7 @@ const handleSubmit = async (e) => {
     if (response && response.data.success) {
       setSuccess(true);
       console.log("Logged in");
+      localStorage.setItem("token",response.data.data)
       navigate("/");
     } else {
       console.error(

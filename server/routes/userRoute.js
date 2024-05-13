@@ -1,7 +1,7 @@
 const router=require("express").Router();
 const bcrypt=require("bcryptjs")
 const User=require("../models/userModel")
-
+const jwt=require("jsonwebtoken");
 
 //register the user
 router.post("/register", async (req,res)=>{
@@ -58,10 +58,13 @@ router.post("/login",async (req,res)=>{
           message: "Invalid Password",
         });
       }
-      
+      const token = jwt.sign({ userId: user._id }, process.env.KEY, {
+        expiresIn: "1d",
+      });
       res.send({
         success: true,
         message: "User is logged in!",
+        data:token
       });
     } catch (error) {
         console.log("Error : ",error);
