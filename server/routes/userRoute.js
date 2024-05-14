@@ -2,6 +2,7 @@ const router=require("express").Router();
 const bcrypt=require("bcryptjs")
 const User=require("../models/userModel")
 const jwt=require("jsonwebtoken");
+const auth = require("../middlewares/auth");
 
 //register the user
 router.post("/register", async (req,res)=>{
@@ -69,6 +70,24 @@ router.post("/login",async (req,res)=>{
     } catch (error) {
         console.log("Error : ",error);
     }
+})
+
+
+// Get user details by id(protected route)
+router.get("/current-user",async (req,res)=>{
+  try {
+    const user=await User.findById(req.body.userId).select("-password")
+    res.send({
+      success:true,
+      message:"User data fetched successfully.",
+      data:user
+    })
+  } catch (error) {
+    res.send({
+      success:false,
+      message:error.message
+    })
+  }
 })
 
 module.exports=router
