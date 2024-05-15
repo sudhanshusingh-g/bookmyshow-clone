@@ -21,12 +21,12 @@ export const loginUser = async (payload) => {
   }
 };
 
-export const cuurentUser = async () => {
+export const currentUser = async () => {
   try {
-    const response = await axiosInstance.post(
+    const response = await axiosInstance.get(
       "/api/users/current-user"
     );
-    return response;
+    return response.data;
   } catch (error) {
     return error;
   }
