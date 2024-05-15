@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom"
 import {useDispatch, useSelector} from "react-redux";
 import { HideLoading, ShowLoading } from "../redux/loaderSlice";
 import { setUser } from "../redux/userSlice";
+import { FiLogOut } from "react-icons/fi";
 
 function ProtectedRoute({children}) {
     const {user}=useSelector((state)=>state.users);
@@ -44,7 +45,18 @@ function ProtectedRoute({children}) {
       <div>
         <div>
           <h1>Book any Show</h1>
-          <p>{user.name.toUpperCase()}</p>
+          <p onClick={()=>{
+            if(user.isAdmin){
+              navigate("/admin");
+            }
+            else{
+              navigate("/profile");
+            }
+          }}>{user.name.toUpperCase()}</p>
+          <span onClick={()=>{
+            localStorage.removeItem("token");
+            navigate("/login");
+          }}><FiLogOut/> Logout</span>
         </div>
         <div>
           {children}

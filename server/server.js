@@ -7,9 +7,10 @@ dotenv.config();
 app.use(cors());
 const dbConfig=require("./config/dbConfig")
 const userRoute=require("./routes/userRoute");
-
+const movieRoute=require("./routes/moviesRoute");
 app.use(express.json())
 app.use("/api/users",userRoute);
+app.use("/api/users",movieRoute);
 
 
 app.listen(port,()=>{

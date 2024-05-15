@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Register.scss";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../apis/users";
 
 function Register() {
@@ -9,6 +10,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const navigate=useNavigate();
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -54,6 +56,12 @@ function Register() {
 
     return () => clearTimeout(timer);
   }, [success]);
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   return (
     <div className="center">
