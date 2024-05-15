@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { loginUser } from "../../apis/users";
-import {useNavigate} from "react-router-dom";
+
+import { useNavigate, Link } from "react-router-dom";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,12 +26,11 @@ const handleSubmit = async (e) => {
 
   try {
     const response = await loginUser({ email, password });
-    console.log("Login response:", response.data.success); // Add this line
     if (response && response.data.success) {
       setSuccess(true);
       console.log("Logged in");
       localStorage.setItem("token",response.data.data)
-      navigate("/");
+      window.location.href="/";
     } else {
       console.error(
         "Login failed:",
@@ -50,12 +50,10 @@ const handleSubmit = async (e) => {
 
 
    useEffect(() => {
-     const timer = setTimeout(() => {
-       setSuccess(false);
-     }, 3000);
-
-     return () => clearTimeout(timer);
-   }, [success]);
+     if (localStorage.getItem("token")) {
+       navigate("/");
+     }
+   }, []);
 
   return (
     <div className="center">
@@ -79,10 +77,15 @@ const handleSubmit = async (e) => {
             required
           />
         </div>
+        {error && <div className="error">{error}</div>}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in.." : "Login"}
         </button>
       </form>
+
+      <p>
+        Not registered? <Link to="/register">Register</Link> yourself
+      </p>
     </div>
   );
 }

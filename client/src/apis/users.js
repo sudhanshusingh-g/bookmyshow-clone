@@ -20,3 +20,14 @@ export const loginUser = async (payload) => {
     return error;
   }
 };
+
+export const cuurentUser = async () => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/users/current-user"
+    );
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

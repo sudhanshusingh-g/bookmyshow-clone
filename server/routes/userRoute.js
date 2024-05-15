@@ -74,7 +74,7 @@ router.post("/login",async (req,res)=>{
 
 
 // Get user details by id(protected route)
-router.get("/current-user",async (req,res)=>{
+router.get("/current-user",auth,async (req,res)=>{
   try {
     const user=await User.findById(req.body.userId).select("-password")
     res.send({
