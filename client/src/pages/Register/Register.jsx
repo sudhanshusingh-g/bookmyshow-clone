@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Register.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { registerUser } from "../../apis/users";
 
 function Register() {
@@ -64,49 +64,67 @@ function Register() {
   }, [navigate]);
 
   return (
-    <div className="center">
-      <h1>Register</h1>
-      {success && (
-        <p className="success-message">
-          Registration successful! Redirecting...
+    <div className="h-[100vh] flex items-center justify-center">
+      <div>
+        <h1 className="text-2xl text-center my-2">Register</h1>
+        {success && (
+          <p className="success-message">
+            Registration successful! Redirecting...
+          </p>
+        )}
+        {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col">
+            <label className="text-sm">Name</label>
+            <input
+              className="p-2 border-2 rounded outline-none"
+              type="text"
+              id="name"
+              value={name}
+              onChange={handleNameChange}
+              required
+            />
+          </div>
+          <div className="flex flex-col my-4">
+            <label className="text-sm">Email</label>
+            <input
+              className="p-2 border-2 rounded outline-none"
+              type="email"
+              id="email"
+              value={email}
+              onChange={handleEmailChange}
+              required
+            />
+          </div>
+          <div className="flex flex-col mb-4">
+            <label className="text-sm">Password</label>
+            <input
+              className="p-2 border-2 rounded outline-none"
+              type="password"
+              id="password"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+            />
+          </div>
+          <button
+            className="bg-slate-700 text-white p-2 w-full rounded hover:bg-slate-900"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Registering..." : "Register"}
+          </button>
+        </form>
+        <p className="mt-4">
+          Already registered?{" "}
+          <Link
+            to="/login"
+            className="cursor-pointer text-blue-700 underline"
+          >
+            Login
+          </Link>{" "}
         </p>
-      )}
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={handleNameChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={handleEmailChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
