@@ -22,21 +22,23 @@ function Home() {
   const dummyMovies = [
     {
       id: 1,
-      name: "Movie 1",
+      title: "Movie 1",
       description: "Description of Movie 1",
       duration: "120 mins",
       genre: "Action",
       language: "English",
       releasedDate: "2022-01-01",
+      posterUrl: "https://example.com/poster1.jpg", // Add poster URL here
     },
     {
       id: 2,
-      name: "Movie 2",
+      title: "Movie 2",
       description: "Description of Movie 2",
       duration: "110 mins",
       genre: "Comedy",
       language: "English",
       releasedDate: "2022-02-15",
+      posterUrl: "https://example.com/poster2.jpg", // Add poster URL here
     },
   ];
 
@@ -78,8 +80,8 @@ function Home() {
       </nav>
 
       {activeTab === "movies" && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-md">
-          <div className="flex justify-between items-center mb-4">
+        <div className="mt-4 p-4 bg-gray-100 rounded-md  overflow-scroll">
+          <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-lg font-semibold">Movies List</h2>
             <button
               onClick={handleAddMoviesClick}
@@ -92,7 +94,7 @@ function Home() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  Title
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Description
@@ -109,12 +111,15 @@ function Home() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Released Date
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Poster
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {movies.map((movie) => (
                 <tr key={movie.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{movie.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{movie.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {movie.description}
                   </td>
@@ -127,6 +132,13 @@ function Home() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {movie.releasedDate}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={movie.posterUrl}
+                      alt={movie.name}
+                      className="h-24"
+                    />
                   </td>
                 </tr>
               ))}
