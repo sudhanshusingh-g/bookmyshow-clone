@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import AddMoviesPopup from "../../components/Popups/AddMoviesPopup";
-
+import { deleteMovie, getMovies } from "../../apis/movies";
+import { addMovie } from "../../apis/movies";
+import { CiEdit } from "react-icons/ci";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import moment from "moment";
 function Home() {
   const [activeTab, setActiveTab] = useState("movies");
   const [isAddMoviesPopupOpen, setIsAddMoviesPopupOpen] = useState(false);
@@ -18,41 +22,54 @@ function Home() {
     setIsAddMoviesPopupOpen(false);
   };
 
-  // Dummy movie data for demonstration
-  const dummyMovies = [
-    {
-      id: 1,
-      title: "Movie 1",
-      description: "Description of Movie 1",
-      duration: "120 mins",
-      genre: "Action",
-      language: "English",
-      releasedDate: "2022-01-01",
-      posterUrl: "https://example.com/poster1.jpg", // Add poster URL here
-    },
-    {
-      id: 2,
-      title: "Movie 2",
-      description: "Description of Movie 2",
-      duration: "110 mins",
-      genre: "Comedy",
-      language: "English",
-      releasedDate: "2022-02-15",
-      posterUrl: "https://example.com/poster2.jpg", // Add poster URL here
-    },
-  ];
+ const fetchData = async () => {
+   try {
+     const response = await getMovies();
+     if (response.success && Array.isArray(response.data)) {
+       setMovies(response.data);
+     } else {
+       console.error("Invalid movies data:", response);
+     }
+   } catch (error) {
+     console.error("Error fetching movies: ", error);
+   }
+ };
 
   useEffect(() => {
-    // Set movies data (You can fetch this data from an API)
-    setMovies(dummyMovies);
-  }, []);
+    
+   fetchData();
+    
+  }, [movies]);
 
-  const handleAddMovie = (newMovie) => {
-    // Add the new movie to the movies list
-    setMovies([...movies, newMovie]);
-    // Close the popup
-    setIsAddMoviesPopupOpen(false);
+  const handleAddMovie = async (newMovie) => {
+    try {
+      const response = await addMovie(newMovie);
+      if (response.status === 200) {
+        setMovies([...movies, response.data]);
+        setIsAddMoviesPopupOpen(false);
+      } else {
+        console.error("Failed to add movie:", response.data);
+      }
+    } catch (error) {
+      console.error("Error adding movie:", error);
+    }
   };
+
+
+  const handleDelete= async (id)=>{
+    try {
+      const response=await deleteMovie(id);
+      if (response.success) {
+        const updatedMoviesList = movies.filter((movie) => movie._id !== id);
+        setMovies(updatedMoviesList);
+        console.log("Movie deleted successfully.");
+      } else {
+        console.error("Failed to delete movie:", response.message);
+      }
+    } catch (error) {
+      console.error("Error deleting movie:", error);
+    }
+  }
 
   return (
     <div className="p-4">
@@ -80,12 +97,12 @@ function Home() {
       </nav>
 
       {activeTab === "movies" && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-md  overflow-scroll">
+        <div className="mt-4 p-4 bg-gray-100 rounded-md">
           <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-lg font-semibold">Movies List</h2>
             <button
               onClick={handleAddMoviesClick}
-              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600"
+              className="text-blue-400 px-3 py-2 rounded-md "
             >
               Add Movies
             </button>
@@ -94,6 +111,9 @@ function Home() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Poster
+                </th>
+                <th className="px-6  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -112,33 +132,28 @@ function Home() {
                   Released Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Poster
+                  Action
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {movies.map((movie) => (
-                <tr key={movie.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{movie.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {movie.description}
+                <tr key={movie._id}>
+                  <td className="px-6 py-4">
+                    <img src={movie.poster} alt={movie.name} className="h-24" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {movie.duration}
+                  <td className="px-6 py-4 text-sm">{movie.title}</td>
+                  <td className="px-6 py-4 text-sm">{movie.description}</td>
+                  <td className="px-6 py-4 text-sm">{movie.duration}</td>
+                  <td className="px-6 py-4 text-sm">{movie.genre}</td>
+                  <td className="px-6 py-4 text-sm">{movie.language}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {moment(movie.releaseDate).format(`YYYY-MM-DD`)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{movie.genre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {movie.language}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {movie.releasedDate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img
-                      src={movie.posterUrl}
-                      alt={movie.name}
-                      className="h-24"
-                    />
+                  <td className="p-4 flex gap-2">
+                    <CiEdit className="text-lg hover:text-blue-400 cursor-pointer" />
+
+                    <MdOutlineDeleteOutline onClick={()=>handleDelete(movie._id)} className="text-lg hover:text-red-400 cursor-pointer" />
                   </td>
                 </tr>
               ))}
