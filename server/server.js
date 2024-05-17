@@ -10,7 +10,7 @@ const userRoute=require("./routes/userRoute");
 const movieRoute=require("./routes/moviesRoute");
 app.use(express.json())
 app.use("/api/users",userRoute);
-app.use("/api/users",movieRoute);
+app.use("/api/movies",movieRoute);
 
 
 app.listen(port,()=>{
