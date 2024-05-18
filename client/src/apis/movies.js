@@ -31,3 +31,18 @@ export const deleteMovie= async (id)=>{
     
   }
 }
+
+//Update a movie
+export const updateMovie = async (id, updatedData) => {
+  try {
+    const response = await axiosInstance.put(`/api/movies/update-movie`, {
+      movieId: id,
+      ...updatedData,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response;
+  }
+};
+
+

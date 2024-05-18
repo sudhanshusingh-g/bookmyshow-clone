@@ -1,13 +1,22 @@
+// Home.jsx
 import { useState, useEffect } from "react";
 import AddMoviesPopup from "../../components/Popups/AddMoviesPopup";
-import { deleteMovie, getMovies } from "../../apis/movies";
-import { addMovie } from "../../apis/movies";
+import EditMoviesPopup from "../../components/Popups/EditMoviesPopup";
+import {
+  deleteMovie,
+  getMovies,
+  addMovie,
+  updateMovie,
+} from "../../apis/movies";
 import { CiEdit } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import moment from "moment";
+
 function Home() {
   const [activeTab, setActiveTab] = useState("movies");
   const [isAddMoviesPopupOpen, setIsAddMoviesPopupOpen] = useState(false);
+  const [isEditMoviesPopupOpen, setIsEditMoviesPopupOpen] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState(null);
   const [movies, setMovies] = useState([]);
 
   const handleTabClick = (tab) => {
@@ -20,26 +29,25 @@ function Home() {
 
   const handleClosePopup = () => {
     setIsAddMoviesPopupOpen(false);
+    setIsEditMoviesPopupOpen(false);
   };
 
- const fetchData = async () => {
-   try {
-     const response = await getMovies();
-     if (response.success && Array.isArray(response.data)) {
-       setMovies(response.data);
-     } else {
-       console.error("Invalid movies data:", response);
-     }
-   } catch (error) {
-     console.error("Error fetching movies: ", error);
-   }
- };
+  const fetchData = async () => {
+    try {
+      const response = await getMovies();
+      if (response.success && Array.isArray(response.data)) {
+        setMovies(response.data);
+      } else {
+        console.error("Invalid movies data:", response);
+      }
+    } catch (error) {
+      console.error("Error fetching movies: ", error);
+    }
+  };
 
   useEffect(() => {
-    
-   fetchData();
-    
-  }, [movies]);
+    fetchData();
+  }, [isAddMoviesPopupOpen, isEditMoviesPopupOpen]);
 
   const handleAddMovie = async (newMovie) => {
     try {
@@ -55,10 +63,9 @@ function Home() {
     }
   };
 
-
-  const handleDelete= async (id)=>{
+  const handleDelete = async (id) => {
     try {
-      const response=await deleteMovie(id);
+      const response = await deleteMovie(id);
       if (response.success) {
         const updatedMoviesList = movies.filter((movie) => movie._id !== id);
         setMovies(updatedMoviesList);
@@ -69,7 +76,30 @@ function Home() {
     } catch (error) {
       console.error("Error deleting movie:", error);
     }
-  }
+  };
+
+  const handleEdit = (movie) => {
+    setSelectedMovie(movie); // Set the selected movie data
+    setIsEditMoviesPopupOpen(true); // Open edit popup
+  };
+
+  const handleUpdate = async (id, updatedData) => {
+    try {
+      const response = await updateMovie(id, updatedData);
+      if (response.success) {
+        const updatedMoviesList = movies.map((movie) =>
+          movie._id === id ? { ...movie, ...updatedData } : movie
+        );
+        setMovies(updatedMoviesList);
+        setIsEditMoviesPopupOpen(false);
+        console.log("Movie updated successfully.");
+      } else {
+        console.error("Failed to update movie:", response.message);
+      }
+    } catch (error) {
+      console.error("Error updating movie:", error);
+    }
+  };
 
   return (
     <div className="p-4">
@@ -113,7 +143,7 @@ function Home() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Poster
                 </th>
-                <th className="px-6  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -151,9 +181,14 @@ function Home() {
                     {moment(movie.releaseDate).format(`YYYY-MM-DD`)}
                   </td>
                   <td className="p-4 flex gap-2">
-                    <CiEdit className="text-lg hover:text-blue-400 cursor-pointer" />
-
-                    <MdOutlineDeleteOutline onClick={()=>handleDelete(movie._id)} className="text-lg hover:text-red-400 cursor-pointer" />
+                    <CiEdit
+                      onClick={() => handleEdit(movie)}
+                      className="text-lg hover:text-blue-400 cursor-pointer"
+                    />
+                    <MdOutlineDeleteOutline
+                      onClick={() => handleDelete(movie._id)}
+                      className="text-lg hover:text-red-400 cursor-pointer"
+                    />
                   </td>
                 </tr>
               ))}
@@ -174,6 +209,13 @@ function Home() {
         isOpen={isAddMoviesPopupOpen}
         onClose={handleClosePopup}
         onAddMovie={handleAddMovie}
+      />
+
+      <EditMoviesPopup
+        isOpen={isEditMoviesPopupOpen}
+        onClose={handleClosePopup}
+        selectedMovie={selectedMovie}
+        onUpdate={handleUpdate}
       />
     </div>
   );
